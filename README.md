@@ -1,0 +1,259 @@
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>New Year Gate</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root {
+  --main: #ffd966;
+  --bg1: #020409;
+  --bg2: #060b14;
+  --bg3: #0b1322;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  height:100vh;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at center, var(--bg3), var(--bg1)),
+    linear-gradient(180deg, #000, #020409);
+  color:#fff;
+  font-family: system-ui, sans-serif;
+}
+
+/* Canvas fireworks */
+canvas {
+  position:fixed;
+  inset:0;
+  z-index:1;
+}
+
+/* Intro */
+#gate {
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(120deg, var(--bg1), var(--bg2));
+  z-index:10;
+  transition:opacity 1.5s ease, transform 1.5s ease;
+}
+
+#gate.hide {
+  opacity:0;
+  transform:scale(1.4);
+  pointer-events:none;
+}
+
+#gate h1 {
+  font-size:3rem;
+  letter-spacing:4px;
+  color:var(--main);
+}
+
+#gate p {
+  margin-top:20px;
+  opacity:0.7;
+}
+
+#gate button {
+  margin-top:40px;
+  padding:14px 40px;
+  background:none;
+  border:2px solid var(--main);
+  color:var(--main);
+  font-size:1rem;
+  letter-spacing:2px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+#gate button::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:var(--main);
+  transform:translateX(-100%);
+  transition:0.4s;
+  z-index:-1;
+}
+
+#gate button:hover { color:#000; }
+#gate button:hover::after { transform:translateX(0); }
+
+/* Main content */
+#scene {
+  position:relative;
+  z-index:2;
+  height:100%;
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+
+.message {
+  max-width:800px;
+  animation: appear 2s ease forwards;
+}
+
+.message h2 {
+  font-size:3rem;
+  color:var(--main);
+  animation:pulse 2.5s infinite;
+}
+
+.message h3 {
+  margin-top:10px;
+  font-size:1.8rem;
+  letter-spacing:3px;
+}
+
+.message p {
+  margin-top:30px;
+  font-size:1.15rem;
+  line-height:1.9;
+  opacity:0;
+  animation:textFade 2s ease forwards;
+  animation-delay:1.5s;
+}
+
+@keyframes pulse {
+  0% { text-shadow:0 0 10px var(--main); }
+  50% { text-shadow:0 0 40px var(--main); }
+  100% { text-shadow:0 0 10px var(--main); }
+}
+
+@keyframes appear {
+  from { transform:translateY(60px); opacity:0; }
+  to { transform:none; opacity:1; }
+}
+
+@keyframes textFade {
+  to { opacity:1; }
+}
+
+/* Footer */
+footer {
+  position:absolute;
+  bottom:15px;
+  width:100%;
+  text-align:center;
+  font-size:0.85rem;
+  opacity:0.6;
+  z-index:3;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div id="gate">
+  <h1>TIME GATE</h1>
+  <p>Hải · Mở cánh cửa năm mới</p>
+  <button onclick="openGate()">OPEN</button>
+</div>
+
+<div id="scene">
+  <div class="message">
+    <h2>CHÚC MỪNG NĂM MỚI</h2>
+    <h3>Nguyễn Song Hải</h3>
+    <p>
+      Năm mới chúc Hải thật nhiều sức khỏe, luôn giữ tinh thần tích cực và sự tự tin vào bản thân. Mong rằng mọi cố gắng của bạn đều được đền đáp xứng đáng, học hành thuận lợi, thi cử suôn sẻ. Chúc bạn một năm mới thật nhiều niềm vui, ăn ngon ngủ kỹ, không stress, buồn phiền để lại năm cũ, đón thêm thật nhiều may mắn trong năm mới 🎉✨
+    </p>
+  </div>
+</div>
+
+<footer>
+  © New Year | Designed exclusively for haeicutes1tg
+</footer>
+
+<script>
+function openGate() {
+  document.getElementById('gate').classList.add('hide');
+}
+
+/* FIREWORKS – COLOR ONLY */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+let w, h;
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+class Firework {
+  constructor() {
+    this.x = Math.random() * w;
+    this.y = Math.random() * h * 0.6;
+    this.hue = Math.random() * 360;
+    this.particles = [];
+    this.count = 80;
+
+    for (let i = 0; i < this.count; i++) {
+      this.particles.push({
+        x: this.x,
+        y: this.y,
+        angle: Math.random() * Math.PI * 2,
+        speed: Math.random() * 6 + 2,
+        alpha: 1,
+        hue: this.hue + Math.random() * 40 - 20
+      });
+    }
+  }
+
+  update() {
+    this.particles.forEach(p => {
+      p.x += Math.cos(p.angle) * p.speed;
+      p.y += Math.sin(p.angle) * p.speed;
+      p.alpha -= 0.02;
+    });
+  }
+
+  draw() {
+    this.particles.forEach(p => {
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(${p.hue},100%,70%,${p.alpha})`;
+      ctx.shadowBlur = 28;
+      ctx.shadowColor = `hsla(${p.hue},100%,60%,1)`;
+      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+}
+
+let fireworks = [];
+
+function animate() {
+  ctx.clearRect(0, 0, w, h); // 👉 NỀN KHÔNG BỊ ĐỔI
+  fireworks.forEach((f,i) => {
+    f.update();
+    f.draw();
+    if (f.particles[0].alpha <= 0) fireworks.splice(i,1);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+setInterval(() => {
+  if (document.getElementById('gate').classList.contains('hide')) {
+    fireworks.push(new Firework());
+  }
+}, 650);
+</script>
+
+</body>
+</html>
